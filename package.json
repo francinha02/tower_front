@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "babel-plugin-transform-define": "^2.0.0",
     "mapbox-gl": "^2.0.1",
     "next": "10.0.5",
     "next-images": "^1.7.0",
