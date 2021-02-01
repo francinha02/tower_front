@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 export const LoginContainer = styled.div`
   .container {
+    position: relative;
     width: 100vw;
     min-height: 100vh;
     position: relative;
@@ -14,7 +15,7 @@ export const LoginContainer = styled.div`
     width: 2000px;
     height: 2000px;
     border-radius: 50%;
-    background: linear-gradient(-45deg, #a61313, #ff8787);
+    background: linear-gradient(-45deg, #a61313 0%, #ff8787 100%);
     top: -10%;
     right: 48%;
     transform: translateY(-50%);
@@ -51,7 +52,7 @@ export const LoginContainer = styled.div`
     overflow: hidden;
 
     grid-column: 1 / 2;
-    grid-row: 1 / 2;
+    grid-row: 2 / 6;
 
     transition: 0.2s 0.7s ease-in-out;
   }
@@ -228,5 +229,126 @@ export const LoginContainer = styled.div`
   .container.sign-up-mode form.sign-up-form {
     z-index: 2;
     opacity: 1;
+  }
+
+  @media (max-width: 870px) {
+    .container {
+      min-height: 880px;
+      height: 100vh;
+    }
+
+    .container::before {
+      width: 1500px;
+      height: 1500px;
+      left: 30%;
+      bottom: 68%;
+      transform: translateX(-50%);
+      right: initial;
+      top: initial;
+      transition: 2s ease-in-out;
+    }
+
+    .sign-in-sign-up {
+      width: 100%;
+      left: 50%;
+      top: 80%;
+      transform: translate(-50%, -100%);
+      transition: 1s 0.8s ease-in-out;
+    }
+
+    .panels-container {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 2fr 1fr;
+    }
+
+    .panel {
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      padding: 2.5rem 8%;
+    }
+
+    .panel .content {
+      padding-right: 15%;
+      transition: 0.9s 0.8s ease-in-out;
+    }
+
+    .panel h3 {
+      font-size: 1.2rem;
+    }
+
+    .panel p {
+      font-size: 0.7rem;
+      padding: 0.5rem 0;
+    }
+
+    .btn.transparent {
+      width: 110px;
+      height: 35px;
+      font-size: 0.7rem;
+    }
+
+    .image {
+      width: 200px;
+      transition: 0.9s 0.6s ease-in-out;
+    }
+
+    .left-panel {
+      grid-row: 1 / 2;
+    }
+
+    .right-panel {
+      grid-row: 3 / 4;
+    }
+
+    .right-panel .content,
+    .right-panel .image {
+      transform: translateY(300px);
+    }
+
+    .container.sign-up-mode::before {
+      transform: translate(-50%, 100%);
+      bottom: 32%;
+      right: initial;
+    }
+
+    .container.sign-up-mode .left-panel .image,
+    .container.sign-up-mode .left-panel .content {
+      transform: translateY(-300px);
+    }
+
+    .container.sign-up-mode .sign-in-sign-up {
+      top: 5%;
+      transform: translate(-50%, 0);
+      left: 50%;
+    }
+  }
+
+  @media (max-width: 570px) {
+    form {
+      padding: 0 1.5rem;
+    }
+
+    .image {
+      display: none;
+    }
+
+    .panel .content {
+      padding: 0.5rem 1rem;
+    }
+
+    .sign-in-sign-up {
+      top: 70%;
+    }
+
+    .container::before {
+      bottom: 72%;
+      left: 50%;
+    }
+
+    .container.sign-up-mode::before {
+      bottom: 28%;
+      left: 50%;
+    }
   }
 `
