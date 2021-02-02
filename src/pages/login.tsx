@@ -2,62 +2,67 @@ import '../utils/fontAwesome'
 import { LoginContainer } from '../styles/pages/Login'
 import Input from '../components/input/Input'
 import Head from '../components/Head'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useAxios } from '../hooks/useAxios'
 
 const Login: React.FC = () => {
-  const [divClass, setDivClass] = useState('container')
+  const [handleClass, setHandleClass] = useState('container')
+  const [loginError, setLoginError] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const addClass = () => {
-    setDivClass('container sign-up-mode')
+    setHandleClass('container sign-up-mode')
   }
 
   const removeClass = () => {
-    setDivClass('container')
+    setHandleClass('container')
+  }
+
+  const handleSubmit = e => {
+    e.preventDefault()
+    fetch('http://201.39.69.70:3000/users/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        password
+      })
+    }).then(async res => {
+      if (res.ok) {
+        console.log(await res.json())
+      }
+    })
   }
 
   return (
     <LoginContainer>
-      <div className={divClass}>
+      <div className={handleClass}>
         <Head title="Login" />
         <div className="forms-container">
           <div className="sign-in-sign-up">
-            <form action="" className="sign-in-form">
+            <form onSubmit={handleSubmit} className="sign-in-form">
               <h2 className="title">Entrar</h2>
               <Input
                 icon="user"
                 type="text"
                 placeholder="Nome de Usuário"
-                divClass="input-field"
+                onChange={e => setUsername(e.target.value)}
               />
 
               <Input
                 icon="lock"
                 type="password"
                 placeholder="Senha"
-                divClass="input-field"
+                onChange={e => setPassword(e.target.value)}
               />
               <input type="submit" value="Login" className="btn solid" />
             </form>
 
             <form action="" className="sign-up-form">
               <h2 className="title">Cadastrar</h2>
-              <Input
-                icon="user"
-                type="text"
-                placeholder="Nome de Usuário"
-                divClass="input-field"
-              />
-              <Input
-                icon="envelope"
-                type="email"
-                placeholder="Senha"
-                divClass="input-field"
-              />
-              <Input
-                icon="lock"
-                type="password"
-                placeholder="Senha"
-                divClass="input-field"
-              />
+              <Input icon="user" type="text" placeholder="Nome de Usuário" />
+              <Input icon="envelope" type="email" placeholder="Senha" />
+              <Input icon="lock" type="password" placeholder="Senha" />
               <input type="submit" value="Cadastrar" className="btn solid" />
             </form>
           </div>
@@ -65,7 +70,7 @@ const Login: React.FC = () => {
         <div className="panels-container">
           <div className="panel left-panel">
             <div className="content">
-              <h3>Novo aqui?</h3>
+              <h3>Esqueceu a Senha?</h3>
               <p>
                 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
                 Dolores quia tenetur ipsum deserunt commodi tempore officiis!
@@ -77,7 +82,7 @@ const Login: React.FC = () => {
                 id="sign-up-btn"
                 onClick={addClass}
               >
-                Cadastrar
+                Recuperar
               </button>
             </div>
             <img src="/authentication.svg" className="image" />

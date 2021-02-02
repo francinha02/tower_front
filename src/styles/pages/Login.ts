@@ -5,7 +5,6 @@ export const LoginContainer = styled.div`
     position: relative;
     width: 100vw;
     min-height: 100vh;
-    position: relative;
     overflow: hidden;
   }
 
