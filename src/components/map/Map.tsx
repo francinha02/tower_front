@@ -5,7 +5,6 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
 import config from '../../config/config'
-import { fetcher } from '../../utils/fetcher'
 faker.locale = 'pt_BR'
 
 interface MapInterface {
