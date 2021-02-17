@@ -2,14 +2,16 @@ import '../utils/fontAwesome'
 import { LoginContainer } from '../styles/pages/Login'
 import Input from '../components/input/Input'
 import Head from '../components/Head'
-import { useCallback, useState } from 'react'
-import { useAxios } from '../hooks/useAxios'
+import { useState } from 'react'
+import api from '../utils/api'
+import { useRouter } from 'next/dist/client/router'
 
 const Login: React.FC = () => {
   const [handleClass, setHandleClass] = useState('container')
   const [loginError, setLoginError] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const router = useRouter()
   const addClass = () => {
     setHandleClass('container sign-up-mode')
   }
@@ -18,20 +20,13 @@ const Login: React.FC = () => {
     setHandleClass('container')
   }
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-    fetch('http://201.39.69.70:3000/users/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username,
-        password
-      })
-    }).then(async res => {
-      if (res.ok) {
-        console.log(await res.json())
-      }
-    })
+    const res = await api.post('/users/auth', { username, password })
+    if (window && res.status === 200) {
+      localStorage.setItem('token', res.data.token)
+      router.push('/maps')
+    }
   }
 
   return (
