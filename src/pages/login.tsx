@@ -4,14 +4,14 @@ import Input from '../components/input/Input'
 import Head from '../components/Head'
 import { useState } from 'react'
 import api from '../utils/api'
-import { useRouter } from 'next/dist/client/router'
+import Router from 'next/router'
 
 const Login: React.FC = () => {
   const [handleClass, setHandleClass] = useState('container')
   const [loginError, setLoginError] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const router = useRouter()
+
   const addClass = () => {
     setHandleClass('container sign-up-mode')
   }
@@ -22,10 +22,14 @@ const Login: React.FC = () => {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    const res = await api.post('/users/auth', { username, password })
-    if (window && res.status === 200) {
-      localStorage.setItem('token', res.data.token)
-      router.push('/maps')
+    try {
+      const res = await api.post('/users/auth', { username, password })
+      if (window && res.status === 200) {
+        localStorage.setItem('token', res.data.token)
+        Router.push('/maps')
+      }
+    } catch (error) {
+      setLoginError(error.response.data[0])
     }
   }
 
@@ -51,6 +55,7 @@ const Login: React.FC = () => {
                 onChange={e => setPassword(e.target.value)}
               />
               <input type="submit" value="Login" className="btn solid" />
+              {loginError && <p style={{ color: 'red' }}>{loginError}</p>}
             </form>
 
             <form action="" className="sign-up-form">
@@ -67,10 +72,11 @@ const Login: React.FC = () => {
             <div className="content">
               <h3>Esqueceu a Senha?</h3>
               <p>
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                Dolores quia tenetur ipsum deserunt commodi tempore officiis!
-                Porro, vel enim quasi repellat, voluptas, earum saepe deserunt
-                amet optio ad explicabo beatae.
+                Caros amigos, a execução dos pontos do programa nos obriga à
+                análise das condições financeiras e administrativas exigidas. É
+                importante questionar o quanto o início da atividade geral de
+                formação de atitudes agrega valor ao estabelecimento das formas
+                de ação.
               </p>
               <button
                 className="btn transparent"
@@ -87,10 +93,11 @@ const Login: React.FC = () => {
             <div className="content">
               <h3>Um de nós?</h3>
               <p>
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                Dolores quia tenetur ipsum deserunt commodi tempore officiis!
-                Porro, vel enim quasi repellat, voluptas, earum saepe deserunt
-                amet optio ad explicabo beatae.
+                Considerando que temos bons administradores de rede, a
+                implementação do código nos obriga à migração de alternativas
+                aos aplicativos convencionais. Por outro lado, a alta
+                necessidade de integridade minimiza o gasto de energia de todos
+                os recursos funcionais envolvidos.
               </p>
               <button
                 className="btn transparent"

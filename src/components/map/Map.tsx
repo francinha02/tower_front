@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
 import config from '../../config/config'
+import { useAxios } from '../../hooks/useAxios'
+import { Adapter } from '../../models/Adapter'
 faker.locale = 'pt_BR'
 
 interface MapInterface {
@@ -18,44 +20,64 @@ interface MapInterface {
   atualizacao: string
   status: string
   velocidade: string
-  endereco: string
+  address: string
 }
 
 const Map: React.FC = () => {
-  const data: MapInterface[] = []
+  const token = {
+    'x-access-token': localStorage.getItem('token')
+  }
+  const { data } = useAxios<Adapter[]>('adapters', token)
+  if (!data) {
+    return <p>Quase lá</p>
+  }
+  console.log(data)
+  const pin: MapInterface[] = []
 
-  for (let i = 0; i < 100; i++) {
+  data.forEach(adapter => {
     const parsedData: MapInterface = {
-      latitude: parseInt(faker.address.latitude()),
-      longitude: parseInt(faker.address.longitude()),
+      latitude: null,
+      longitude: null,
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
       placa: faker.vehicle.vin(),
       cliente: `${faker.name.firstName()} ${faker.name.lastName()}`,
       modelo: faker.vehicle.manufacturer(),
       atualizacao: faker.date.recent().toString(),
-      status: faker.random.boolean() ? 'ON' : 'OFF',
-      velocidade: `${faker.random.number(180)}Km/h`,
-      endereco: `${faker.address.streetName()}, ${faker.address.state()}`
+      status: null,
+      velocidade: null,
+      address: `${faker.address.streetName()}, ${faker.address.state()}`
     }
 
-    data.push(parsedData)
-  }
+    if (adapter.location.length > 0) {
+      const sortLocation = adapter.location.sort(
+        (a, b) => Date.parse(b.createAt) - Date.parse(a.createAt)
+      )
+      console.log(sortLocation[0])
+      parsedData.velocidade = `${sortLocation[0].speed}Km/h`
+      parsedData.latitude = sortLocation[0].latitude
+      parsedData.longitude = sortLocation[0].longitude
+    }
+    if (adapter.statusId.length > 0) {
+      const sortStatus = adapter.statusId.sort(
+        (a, b) => Date.parse(b.createAt) - Date.parse(a.createAt)
+      )
+      parsedData.status = sortStatus[0].valid ? 'ON' : 'OFF'
+    }
+    pin.push(parsedData)
+  })
 
-  if (!data) {
-    return <p>Carregando ...</p>
-  }
   return (
     <MapContainer
       center={[-3.8580372, -38.495503]}
-      zoom={3}
+      zoom={5}
       scrollWheelZoom={false}
     >
       <TileLayer
         url={`https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}@2x?access_token=${config.mapboxKey}`}
         attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
       />
-      {data.map(parsed => (
+      {pin.map(parsed => (
         // eslint-disable-next-line react/jsx-key
         <Marker position={[parsed.latitude, parsed.longitude]} draggable={true}>
           <Popup>
@@ -65,7 +87,7 @@ const Map: React.FC = () => {
             Atualização: {parsed.atualizacao} <br />
             Status: {parsed.status} <br />
             Velocidade: {parsed.velocidade} <br />
-            Endereço: {parsed.endereco} <br />
+            Endereço: {parsed.address} <br />
           </Popup>
         </Marker>
       ))}
