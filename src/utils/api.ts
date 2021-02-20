@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://apvbrasil.tech/'
+  baseURL: 'https://apvbrasil.tech/'
 })
 
 export default api
