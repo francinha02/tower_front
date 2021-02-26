@@ -1,15 +1,15 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-
 import faker from 'faker'
-import 'leaflet/dist/leaflet.css'
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
+import 'leaflet/dist/leaflet.css'
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import config from '../../config/config'
-import { useAxios } from '../../hooks/useAxios'
 import { Adapter } from '../../models/Adapter'
+
 faker.locale = 'pt_BR'
 
 interface MapInterface {
+  id: string
   latitude: number
   longitude: number
   firstName: string
@@ -17,23 +17,26 @@ interface MapInterface {
   placa: string
   cliente: string
   modelo: string
-  atualizacao: string
+  atual: string
   status: string
-  velocidade: string
+  velocidade: number
   address: string
 }
 
-const Map: React.FC = () => {
-  const token = {
-    'x-access-token': localStorage.getItem('token')
-  }
-  const { data } = useAxios<Adapter[]>('adapters', token)
-  if (!data) {
-    return <p>Quase lá</p>
-  }
-  console.log(data)
-  const pin: MapInterface[] = []
+type MapProps = {
+  data: Adapter[]
+}
 
+const MapPlaceholder = () => {
+  return (
+    <p>
+      <noscript>You need to enable JavaScript to see this map.</noscript>
+    </p>
+  )
+}
+
+const Map: React.FC<MapProps> = ({ data }) => {
+  const pin: MapInterface[] = []
   data.forEach(adapter => {
     const parsedData: MapInterface = {
       latitude: null,
@@ -43,24 +46,24 @@ const Map: React.FC = () => {
       placa: faker.vehicle.vin(),
       cliente: `${faker.name.firstName()} ${faker.name.lastName()}`,
       modelo: faker.vehicle.manufacturer(),
-      atualizacao: faker.date.recent().toString(),
+      atual: null,
       status: null,
       velocidade: null,
-      address: `${faker.address.streetName()}, ${faker.address.state()}`
+      address: `${faker.address.streetName()}, ${faker.address.state()}`,
+      id: adapter.equipmentNumber.toString()
     }
-
     if (adapter.location.length > 0) {
       const sortLocation = adapter.location.sort(
-        (a, b) => Date.parse(b.createAt) - Date.parse(a.createAt)
+        (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)
       )
-      console.log(sortLocation[0])
-      parsedData.velocidade = `${sortLocation[0].speed}Km/h`
+      parsedData.velocidade = sortLocation[0].speed
       parsedData.latitude = sortLocation[0].latitude
       parsedData.longitude = sortLocation[0].longitude
+      parsedData.atual = sortLocation[0].serverTime
     }
     if (adapter.statusId.length > 0) {
       const sortStatus = adapter.statusId.sort(
-        (a, b) => Date.parse(b.createAt) - Date.parse(a.createAt)
+        (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)
       )
       parsedData.status = sortStatus[0].valid ? 'ON' : 'OFF'
     }
@@ -70,21 +73,25 @@ const Map: React.FC = () => {
   return (
     <MapContainer
       center={[-3.8580372, -38.495503]}
-      zoom={5}
+      zoom={6}
       scrollWheelZoom={false}
+      placeholder={<MapPlaceholder />}
     >
       <TileLayer
         url={`https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}@2x?access_token=${config.mapboxKey}`}
-        attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
+        attribution='Map data &copy; <a href="https://www.mapbox.org/">MapBox</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
       />
       {pin.map(parsed => (
-        // eslint-disable-next-line react/jsx-key
-        <Marker position={[parsed.latitude, parsed.longitude]} draggable={true}>
+        <Marker
+          position={[parsed.latitude, parsed.longitude]}
+          draggable={true}
+          key={parsed.id}
+        >
           <Popup>
             Cliente: {parsed.cliente} <br />
             Placa: {parsed.placa} <br />
             Modelo: {parsed.modelo} <br />
-            Atualização: {parsed.atualizacao} <br />
+            Atualização: {parsed.atual} <br />
             Status: {parsed.status} <br />
             Velocidade: {parsed.velocidade} <br />
             Endereço: {parsed.address} <br />

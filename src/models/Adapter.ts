@@ -6,6 +6,7 @@ export type MobileOperator =
   | 'Vivo'
   | 'Vodafone'
   | 'Outras'
+
 export type TimeZone =
   | 'GMT-14'
   | 'GMT-13'
@@ -34,10 +35,17 @@ export type TimeZone =
   | 'GMT+11'
   | 'GMT+12'
 
-export interface Location {
-  createAt: string
-  serverTime: Date
-  fixTime: Date
+export interface Base {
+  id: string
+  active: boolean
+  deleted: boolean
+  createdAt: string
+  updateAt: string
+}
+
+export interface Location extends Base {
+  serverTime: string
+  fixTime: string
   satellite: number
   latitude: number
   longitude: number
@@ -46,7 +54,7 @@ export interface Location {
   cellId: string
 }
 
-export interface Info {
+export interface Info extends Base {
   odometer: number
   power: number
   serial: number
@@ -56,8 +64,7 @@ export interface Info {
   archive: boolean
 }
 
-export interface Status {
-  createAt: string
+export interface Status extends Base {
   blocked: boolean
   valid: boolean
   charge: boolean
@@ -65,8 +72,8 @@ export interface Status {
   battery: number
   info: Info
 }
-export interface Adapter {
-  createAt: string
+
+export interface Adapter extends Base {
   code: number
   description: string
   model: ModelType

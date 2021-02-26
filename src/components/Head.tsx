@@ -9,6 +9,7 @@ const Head: React.FC<HeadType> = ({ title, href, rel }) => {
   return (
     <NextHead>
       <title>{title}</title>
+      <link rel="icon" href="/favicon.ico" />
       <link href={href} rel={rel}></link>
     </NextHead>
   )
